@@ -1,7 +1,7 @@
-const handleEvent = (type, data, respond) => {
+const handleEvent = (type, data, callback) => {
     if (type === "message") {
         console.log(`Mensaje recibido: ${data.msg}`);
-        respond("message", { msg: `Mensaje recibido: ${data.msg}` });
+        callback("message", { msg: `Mensaje recibido: ${data.msg}` });
     }
 };
 
