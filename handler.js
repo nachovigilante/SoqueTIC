@@ -4,7 +4,8 @@ const handleEvent = (type, data) => {
     console.log(`Mensaje recibido: ${data.msg}`);
     result = { msg: `Mensaje recibido: ${data.msg}` };
   } else if (type === "date") {
-    result = new Date();
+    const date = new Date();
+    result = `${date.getUTCDate()}/${date.getUTCMonth() + 1}`;
   }
 
   return result;

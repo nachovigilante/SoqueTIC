@@ -14,6 +14,5 @@ form.addEventListener("submit", (e) => {
 });
 
 fetchData("date", (data) => {
-  console.log(typeof data);
-  date.innerText = `${data.getUTCDay}/${data.getUTCMonth}`;
+  date.innerText = data;
 });
