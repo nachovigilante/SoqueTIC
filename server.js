@@ -16,12 +16,17 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("User connected");
-  socket.on("event", (data) => {
-    const [type, result] = handleEvent(data.type, data.payload);
-    socket.emit("event", {
-      type,
-      payload: result,
-    });
+  socket.on("realTimeEvent", (type, data, callback) => {
+    const result = handleEvent(type, data);
+    callback(result);
+  });
+  socket.on("GETEvent", (type, callback) => {
+    const result = handleEvent(type, undefined);
+    callback(result);
+  });
+  socket.on("POSTEvent", (type, data, callback) => {
+    const result = handleEvent(type, data);
+    callback(result);
   });
   socket.on("disconnect", () => {
     console.log("User disconnected");

@@ -3,9 +3,11 @@ const handleEvent = (type, data) => {
   if (type === "message") {
     console.log(`Mensaje recibido: ${data.msg}`);
     result = { msg: `Mensaje recibido: ${data.msg}` };
+  } else if (type === "date") {
+    result = new Date();
   }
 
-  return [type, result];
+  return result;
 };
 
 export default handleEvent;

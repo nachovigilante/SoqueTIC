@@ -1,15 +1,19 @@
 const form = document.getElementById("form");
 const input = document.getElementById("input");
 const a = document.getElementById("a");
+const date = document.getElementById("fecha");
 
 form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (input.value) {
-        send("message", { msg: input.value });
-        input.value = "";
-    }
+  e.preventDefault();
+  if (input.value) {
+    postData("message", { msg: input.value }, (data) => {
+      a.innerHTML = data.msg;
+    });
+    input.value = "";
+  }
 });
 
-receive("message", (data) => {
-    a.innerHTML = data.msg;
+fetchData("date", (data) => {
+  console.log(typeof data);
+  date.innerText = `${data.getUTCDay}/${data.getUTCMonth}`;
 });
