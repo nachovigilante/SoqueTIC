@@ -14,6 +14,6 @@ const fetchData = (type, callback) => {
   socket.emit("GETEvent", type, callback);
 };
 
-const postData = (type, data, callback = undefined) => {
+const postData = (type, data, callback = () => {}) => {
   socket.emit("POSTEvent", type, data, callback);
 };
