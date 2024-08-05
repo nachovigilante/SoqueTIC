@@ -1,54 +1,40 @@
 # SoqueTIC
 
-Hola soquete, ¿querés correr este proyecto? Seguí estos pasos.
+Hola soquete, ¿querés conectar tu front con el back? Seguí estos pasos.
 
-## ¿Cómo instalar el proyecto?
-
-```bash
-npm i
-```
-
-## ¿Cómo correr el proyecto?
-
-Levantar el servidor del backend:
+## ¿Cómo se instala?
 
 ```bash
-npm start
+npm i soquetic
 ```
-
-Opcionalmente, se puede levantar en modo desarrollo:
-
-```bash
-npm run dev
-```
-
-## ¿Cómo levantar el front?
-
-El front es un archivo HTML y dos archivos js linkeados al html, por lo que se pueden abrir directamente en el navegador. También se puede levantar un servidor de desarrollo con:
-
-```bash
-npx http-server
-```
-
-Los archivos se encuentran dentro de la carpeta `front`, pero pueden ser movidos a cualquier otro lugar (mientras esté en la misma máquina que el server).
 
 ## ¿Cómo se usa?
 
+Además de esta documentación, pueden ver un ejemplo de uso en la [Demo](https://github.com/nachovigilante/Demo-SoqueTIC).
+
 ### Backend
 
-El backend es un servidor de Express.js y Socket.io que escucha en el puerto 3000. Escucha únicamente un evento: `event`. Cuando recibe un evento, llama a la función `handleEvent` que se encuentra en `/handler.js`.
-La función tiene 3 parámetros:
-- `type` con el que se pueden distinguir distintos eventos.
-- `data` que trae la información asociada a dicho evento.
-- `callback` es una función con la cual se pueden enviar respuestas al cliente. Esta función toma 2 parámetros, `type` que el tipo del evento **a responder** y `data` que es la información a responder.
+El backend es un servidor de Express.js y Socket.io que escucha en el puerto 3000. Para responder eventos, se usan de soquetic dos funciones: `onEvent` y `startServer`.
+- `onEvent` toma dos parámetros: `type` y `callback`
+    - `type` es un string que se utiliza para identificar el evento a responder. Debe coincidir con el llamado del front.
+    - `callback` es **la función** a ser llamada cuando llegue dicho evento. Tiene que tomar un único parámetro, `data`, en donde llega la información necesaria para responder al evento.
+- `startServer` no toma parámetros, y se llama en el archivo principal a correr para levantar el servidor.
+
+Entonces, para usar SoqueTIC hay que hacer tantos `onEvent` como eventos quiero saber responder, y en el archivo principal a correr con `node JS` llamar a la función `startServer`
 
 ### Frontend
 
-El frontend es un HTML que se conecta al servidor de Socket.io por medio de la librería `socket.io-client`. El script `socket.js` se encarga de manejar la conexión y los eventos. 
-Se pueden enviar eventos al servidor con la función `send`, que toma 2 parámetros:
-- `type` con el que se pueden distinguir distintos eventos.
-- `data` que tiene la información a enviar.
+El frontend es un HTML que se conecta al servidor de Socket.io por medio de la librería `socket.io-client`. El script `socket.js` se encarga de manejar la conexión y los eventos. Por cada archivo html que necesite conectarse al back, necesitan importar el archivo `socket.js` que se encuentra en la demo.
 
-Se pueden recibir eventos del servidor con la función `recieve`, que toma 2 parámetros:
+Se pueden pedir datos al servidor con la función `fetchData`, que toma 2 parámetros:
 - `type` con el que se pueden distinguir distintos eventos.
-- `callback` que toma **una función** de un parámetro, `data`, que sería la información a recibir.
+- `callback` **función** a ser llamada cuando el servidor responda con la información deseada. Esta debe tomar un único parámetro, `data`, que sería la información a recibir.
+
+Se pueden enviar datos al servidor con la función `postData`, que toma 3 parámetros (1 opcional):
+- `type` con el que se pueden distinguir distintos eventos.
+- `data` es la información a ser enviada al servidor.
+- `callback` (opcional, puede quedar vacío) **función** a ser llamada cuando el servidor responda con la información deseada. Esta debe tomar un único parámetro, `data`, que sería la información que recibe del servidor.
+
+Se pueden recibir instrucciones/datos en tiempo real con la función `recieve`, que toma 2 parámetros:
+- `type` con el que se pueden distinguir distintos eventos.
+- `callback` **función** a ser llamada cuando el servidor envía un evento al front. Esta debe tomar un único parámetro, `data`, que sería la información a recibir.
