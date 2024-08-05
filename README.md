@@ -20,10 +20,9 @@ El backend es un servidor de Express.js y Socket.io que escucha en el puerto 300
 - `type` es un string que se utiliza para identificar el evento a responder. Debe coincidir con el llamado del front.
 - `callback` es **la función** a ser llamada cuando llegue dicho evento. Tiene que tomar un único parámetro, `data`, en donde llega la información necesaria para responder al evento.
 
-`sendEvent` sirve para enviar eventos al frontend. Toma 3 parámetros (1 opcional):
+`sendEvent` sirve para enviar eventos al frontend sin que necesariamente los pida (realTime). Toma 2 parámetros:
 - `type` con el que se pueden distinguir distintos eventos.
 - `data` es la información a ser enviada al frontend.
-- `callback` (opcional, puede quedar vacío) **función** a ser llamada cuando el frontend responda al evento. Esta debe tomar un único parámetro, `data`, que sería la información que recibe del frontend.
 
 `startServer` sirve para inicializar el backend. no toma parámetros, y se llama en el archivo principal a correr para levantar el servidor.
 

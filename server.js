@@ -47,8 +47,8 @@ io.on("connection", (socket) => {
     });
 });
 
-const sendEvent = (type, data, callback = () => {}) => {
-    io.emit("realTimeEvent", type, data, callback);
+const sendEvent = (type, data) => {
+    io.emit("realTimeEvent", type, data);
 };
 
 const startServer = () => {
