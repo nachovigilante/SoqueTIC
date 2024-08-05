@@ -1,13 +1,15 @@
 {
     "name": "soquetic",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "",
     "main": "server.js",
     "type": "module",
     "scripts": {},
     "keywords": [],
     "author": {
-        "name": "Ignacio Vigilante"
+        "name": "Ignacio Vigilante",
+        "email": "nachovigilante@gmail.com",
+        "url": "https://github.com/nachovigilante"
     },
     "contributors": [
         {
