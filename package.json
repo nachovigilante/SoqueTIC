@@ -6,7 +6,16 @@
     "type": "module",
     "scripts": {},
     "keywords": [],
-    "author": "",
+    "author": {
+        "name": "Ignacio Vigilante"
+    },
+    "contributors": [
+        {
+            "name": "Julián Zylber",
+            "email": "zylberjulian@gmail.com",
+            "url": "https://github.com/JZylber"
+        }
+    ],
     "license": "ISC",
     "dependencies": {
         "express": "^4.18.2",
