@@ -47,10 +47,14 @@ io.on("connection", (socket) => {
     });
 });
 
+const sendEvent = (type, data, callback = () => {}) => {
+    io.emit("realTimeEvent", type, data, callback);
+};
+
 const startServer = () => {
     server.listen(PORT, () => {
         console.log("App running");
     });
 };
 
-export { onEvent, startServer };
+export { onEvent, sendEvent, startServer };

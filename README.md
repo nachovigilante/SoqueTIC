@@ -14,11 +14,18 @@ Además de esta documentación, pueden ver un ejemplo de uso en la [Demo](https:
 
 ### Backend
 
-El backend es un servidor de Express.js y Socket.io que escucha en el puerto 3000. Para responder eventos, se usan de soquetic dos funciones: `onEvent` y `startServer`.
-- `onEvent` toma dos parámetros: `type` y `callback`
-    - `type` es un string que se utiliza para identificar el evento a responder. Debe coincidir con el llamado del front.
-    - `callback` es **la función** a ser llamada cuando llegue dicho evento. Tiene que tomar un único parámetro, `data`, en donde llega la información necesaria para responder al evento.
-- `startServer` no toma parámetros, y se llama en el archivo principal a correr para levantar el servidor.
+El backend es un servidor de Express.js y Socket.io que escucha en el puerto 3000. Para responder eventos, soquetic cuenta con tres funciones: `onEvent`, `sendEvent` y `startServer`.
+
+`onEvent` sirve para asociar acciones a eventos. Toma dos parámetros: `type` y `callback`
+- `type` es un string que se utiliza para identificar el evento a responder. Debe coincidir con el llamado del front.
+- `callback` es **la función** a ser llamada cuando llegue dicho evento. Tiene que tomar un único parámetro, `data`, en donde llega la información necesaria para responder al evento.
+
+`sendEvent` sirve para enviar eventos al frontend. Toma 3 parámetros (1 opcional):
+- `type` con el que se pueden distinguir distintos eventos.
+- `data` es la información a ser enviada al frontend.
+- `callback` (opcional, puede quedar vacío) **función** a ser llamada cuando el frontend responda al evento. Esta debe tomar un único parámetro, `data`, que sería la información que recibe del frontend.
+
+`startServer` sirve para inicializar el backend. no toma parámetros, y se llama en el archivo principal a correr para levantar el servidor.
 
 Entonces, para usar SoqueTIC hay que hacer tantos `onEvent` como eventos quiero saber responder, y en el archivo principal a correr con `node JS` llamar a la función `startServer`
 
