@@ -22,5 +22,8 @@
     "dependencies": {
         "express": "^4.18.2",
         "socket.io": "^4.7.4"
+    },
+    "publishConfig": {
+        "@nachovigilante:registry": "https://npm.pkg.github.com"
     }
 }
