@@ -1,6 +1,6 @@
 {
     "name": "soquetic",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "",
     "main": "server.js",
     "type": "module",
@@ -24,6 +24,6 @@
         "socket.io": "^4.7.4"
     },
     "publishConfig": {
-        "@nachovigilante:registry": "https://npm.pkg.github.com"
+        "@nachovigilante:registry": "https://registry.npmjs.org"
     }
 }
