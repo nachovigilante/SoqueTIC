@@ -10,7 +10,6 @@ const onEvent = (type, handler) => {
 };
 
 const app = express();
-const PORT = 3000;
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
@@ -51,7 +50,7 @@ const sendEvent = (type, data) => {
     io.emit("realTimeEvent", type, data);
 };
 
-const startServer = () => {
+const startServer = (PORT = 3000) => {
     server.listen(PORT, () => {
         console.log("App running");
     });
