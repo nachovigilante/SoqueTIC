@@ -10,7 +10,10 @@ npm i soquetic
 
 ## ¿Cómo se usa?
 
-Además de esta documentación, pueden ver un ejemplo de uso en la [Demo](https://github.com/nachovigilante/Demo-SoqueTIC).
+Además de esta documentación, pueden ver ejemplos de uso en las siguientes demos:
+- [Demo Básica](https://github.com/nachovigilante/Demo-SoqueTIC): Envío de mensajes de frontend a backend
+- [Demo Arduino](https://github.com/JZylber/Demo-Arduino): Envío de mensajes entre frontend, backend y arduino
+- [Fixture](https://github.com/JZylber/Fixture): Ejemplo más complejo de frontend y backend con lectura y escritura de json.
 
 ### Backend
 
