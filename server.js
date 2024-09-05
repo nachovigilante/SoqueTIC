@@ -28,7 +28,7 @@ const handleEvent = (type, data) => {
 };
 
 io.on("connection", (socket) => {
-    console.log("User connected");
+    console.log("Se conectó un soquete");
     socket.on("realTimeEvent", (type, data, callback) => {
         const result = handleEvent(type, data);
         callback(result);
@@ -42,7 +42,7 @@ io.on("connection", (socket) => {
         callback(result);
     });
     socket.on("disconnect", () => {
-        console.log("User disconnected");
+        console.log("Se desconectó un soquete");
     });
 });
 
@@ -52,7 +52,9 @@ const sendEvent = (type, data) => {
 
 const startServer = (PORT = 3000) => {
     server.listen(PORT, () => {
-        console.log("App running");
+        console.log(
+            "Servidor prendido\nEscuchando eventos...\nPara parar el servidor, apretá Ctrl + C\n"
+        );
     });
 };
 
