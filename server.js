@@ -29,16 +29,16 @@ const handleEvent = (type, data) => {
 
 io.on("connection", (socket) => {
     console.log("Se conectó un soquete");
-    socket.on("realTimeEvent", (type, data, callback) => {
-        const result = handleEvent(type, data);
+    socket.on("realTimeEvent", async (type, data, callback) => {
+        const result = await handleEvent(type, data);
         callback(result);
     });
-    socket.on("GETEvent", (type, callback) => {
-        const result = handleEvent(type, undefined);
+    socket.on("GETEvent", async (type, callback) => {
+        const result = await handleEvent(type, undefined);
         callback(result);
     });
-    socket.on("POSTEvent", (type, data, callback) => {
-        const result = handleEvent(type, data);
+    socket.on("POSTEvent", async (type, data, callback) => {
+        const result = await handleEvent(type, data);
         callback(result);
     });
     socket.on("disconnect", () => {
