@@ -22,10 +22,11 @@ const io = new Server(server, {
 
 const handleEvent = (type, data) => {
     const handler = events[type];
-
     if (handler !== undefined) return handler(data);
-
-    throw new Error(`Tipo de evento no soportado: ${type}`);
+    console.log(`Llegó un evento no soportado: ${type}`);
+    return {
+        error: `Evento no soportado en el backend: ${type}.\nRevisar que haya un onEvent apropiado en el backend y/o revisar que coincidan los tipos de mensajes.`,
+    };
 };
 
 io.on("connection", (socket) => {
