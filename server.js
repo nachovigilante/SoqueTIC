@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import chalk from "chalk";
 
 // events es un objeto que contiene los eventos que se pueden ejecutar y sus respectivos handlers
 const events = {};
@@ -27,24 +28,20 @@ const handleEvent = async (type, data) => {
     if (handler !== undefined) {
         DEBUGMODE &&
             console.log(
-                `Llegó un evento: \x1b[32m'${type}'\x1b[0m${
+                `Llegó un evento: ${chalk.green(`'${type}'`)}${
                     data
-                        ? ` con la siguiente información:\n\x1b[34m${JSON.stringify(
-                              data,
-                              null,
-                              2
-                          )}\x1b[0m`
+                        ? ` con la siguiente información:\n${chalk.blue(
+                              JSON.stringify(data, null, 2)
+                          )}`
                         : ""
                 }`
             );
         const response = await handler(data);
         DEBUGMODE &&
             console.log(
-                `Se respondió al evento \x1b[32m'${type}'\x1b[0m con:\n\x1b[34m${JSON.stringify(
-                    response,
-                    null,
-                    2
-                )}\x1b[0m`
+                `Se respondió al evento ${chalk.green(
+                    `'${type}'`
+                )} con:\n${chalk.blue(JSON.stringify(response, null, 2))}`
             );
         return {
             status: 200,
@@ -52,7 +49,7 @@ const handleEvent = async (type, data) => {
         };
     }
     DEBUGMODE &&
-        console.log(`\x1b[31mLlegó un evento no soportado: '${type}'\x1b[0m`);
+        console.log(chalk.red(`Llegó un evento no soportado: '${type}'`));
     return {
         status: 404,
         message: `Evento '${type}' no soportado.\nRevisá que esté el onEvent apropiado y que coincidan los tipos.`,
@@ -60,7 +57,7 @@ const handleEvent = async (type, data) => {
 };
 
 io.on("connection", (socket) => {
-    DEBUGMODE && console.log("\x1b[90mSe conectó un soquete\x1b[0m");
+    DEBUGMODE && console.log(chalk.gray("Se conectó un soquete"));
     socket.on("realTimeEvent", async (type, data, callback) => {
         try {
             const result = await handleEvent(type, data);
@@ -106,18 +103,18 @@ io.on("connection", (socket) => {
         }
     });
     socket.on("disconnect", () => {
-        DEBUGMODE && console.log("\x1b[90mSe desconectó un soquete\x1b[0m");
+        DEBUGMODE && console.log(chalk.gray("Se desconectó un soquete"));
     });
 });
 
 const sendEvent = (type, data) => {
     DEBUGMODE &&
         console.log(
-            `Enviando evento: \x1b[32m'${type}'\x1b[0m con la siguiente información:\n\x1b[34m${JSON.stringify(
-                data,
-                null,
-                2
-            )}\x1b[0m`
+            `Enviando evento: ${chalk.green(
+                `'${type}'`
+            )} con la siguiente información:\n${chalk.blue(
+                JSON.stringify(data, null, 2)
+            )}`
         );
     io.emit("realTimeEvent", type, data);
 };
@@ -126,11 +123,23 @@ const startServer = (PORT = 3000, DEBUG = true) => {
     DEBUGMODE = DEBUG;
     server.listen(PORT, () => {
         console.log(
-            `\x1b[93m¡Servidor prendido!\n\x1b[0mEscuchando eventos...\n\x1b[90mPara parar el servidor, apretá Ctrl + C\n${
+            `${chalk.yellowBright(
+                "¡Servidor prendido!"
+            )}\nEscuchando eventos...\n${chalk.gray(
+                "Para parar el servidor, apretá Ctrl + C"
+            )}\n${
                 DEBUG
-                    ? "Para que no se muestren por consola los mensajes sobre el funcionamiento de \x1b[0mSoqueTIC\x1b[90m, iniciar \x1b[32mstartServer\x1b[90m con modo \x1b[34m'DEBUG'\x1b[90m en \x1b[32mfalse\n"
+                    ? chalk.gray(
+                          `Para que no se muestren por consola los mensajes sobre el funcionamiento de ${chalk.white(
+                              "SoqueTIC"
+                          )}, iniciar ${chalk.green(
+                              "startServer"
+                          )} con modo ${chalk.blue("'DEBUG'")} en ${chalk.green(
+                              "false"
+                          )}`
+                      )
                     : ""
-            }\x1b[0m`
+            }\n`
         );
     });
 };
