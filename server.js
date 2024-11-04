@@ -62,8 +62,20 @@ const handleEvent = async (type, data) => {
 io.on("connection", (socket) => {
     DEBUGMODE && console.log("\x1b[90mSe conectó un soquete\x1b[0m");
     socket.on("realTimeEvent", async (type, data, callback) => {
-        const result = await handleEvent(type, data);
-        callback(result);
+        try {
+            const result = await handleEvent(type, data);
+            callback(result);
+        } catch (e) {
+            callback({
+                status: 500,
+                message: `El servidor crasheó al mandar el mensaje '${type}' con la data:\n${JSON.stringify(
+                    data,
+                    null,
+                    2
+                )}`,
+            });
+            throw e;
+        }
     });
     socket.on("GETEvent", async (type, callback) => {
         try {
