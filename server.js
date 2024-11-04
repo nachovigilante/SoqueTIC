@@ -22,7 +22,7 @@ const io = new Server(server, {
     },
 });
 
-const handleEvent = (type, data) => {
+const handleEvent = async (type, data) => {
     const handler = events[type];
     if (handler !== undefined) {
         DEBUGMODE &&
@@ -33,7 +33,7 @@ const handleEvent = (type, data) => {
                     2
                 )}\x1b[0m`
             );
-        const response = handler(data);
+        const response = await handler(data);
         DEBUGMODE &&
             console.log(
                 `Se ejecutó el handler de \x1b[32m'${type}'\x1b[0m con la siguiente respuesta:\n\x1b[34m${JSON.stringify(
@@ -42,12 +42,16 @@ const handleEvent = (type, data) => {
                     2
                 )}\x1b[0m`
             );
-        return response;
+        return {
+            status: 200,
+            data: response,
+        };
     }
     DEBUGMODE &&
         console.log(`\x1b[31mLlegó un evento no soportado: '${type}'\x1b[0m`);
     return {
-        error: `Evento no soportado en el backend: ${type}.\nRevisar que haya un onEvent apropiado en el backend y/o revisar que coincidan los tipos de mensajes.`,
+        status: 404,
+        message: `Evento '${type}' no soportado.\nRevisá que esté el onEvent apropiado y que coincidan los tipos.`,
     };
 };
 
