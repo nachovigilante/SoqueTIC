@@ -40,7 +40,7 @@ const handleEvent = async (type, data) => {
         const response = await handler(data);
         DEBUGMODE &&
             console.log(
-                `Se respondió al mensaje \x1b[32m'${type}'\x1b[0m con:\n\x1b[34m${JSON.stringify(
+                `Se respondió al evento \x1b[32m'${type}'\x1b[0m con:\n\x1b[34m${JSON.stringify(
                     response,
                     null,
                     2
