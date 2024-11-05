@@ -8,6 +8,16 @@ const events = {};
 // DEBUG es un booleano que determina si se muestran mensajes de debug en la consola
 let DEBUGMODE = true;
 
+const makeStyledJSON = (object) => {
+    const json = JSON.stringify(object, null, 2);
+    const lineCount = json.split("\n").length;
+    let styledJSON = chalk.blue(json.split("\n").slice(0, 15).join("\n"));
+    if (lineCount > 15) {
+        styledJSON += `\n... y ${lineCount - 15} líneas más`;
+    }
+    return styledJSON;
+};
+
 const onEvent = (type, handler) => {
     events[type] = handler;
 };
@@ -30,8 +40,8 @@ const handleEvent = async (type, data) => {
             console.log(
                 `Llegó un evento: ${chalk.green(`'${type}'`)}${
                     data
-                        ? ` con la siguiente información:\n${chalk.blue(
-                              JSON.stringify(data, null, 2)
+                        ? ` con la siguiente información:\n${makeStyledJSON(
+                              data
                           )}`
                         : ""
                 }`
@@ -41,7 +51,7 @@ const handleEvent = async (type, data) => {
             console.log(
                 `Se respondió al evento ${chalk.green(
                     `'${type}'`
-                )} con:\n${chalk.blue(JSON.stringify(response, null, 2))}`
+                )} con:\n${makeStyledJSON(response)}`
             );
         return {
             status: 200,
@@ -112,9 +122,7 @@ const sendEvent = (type, data) => {
         console.log(
             `Enviando evento: ${chalk.green(
                 `'${type}'`
-            )} con la siguiente información:\n${chalk.blue(
-                JSON.stringify(data, null, 2)
-            )}`
+            )} con la siguiente información:\n${makeStyledJSON(data)}`
         );
     io.emit("realTimeEvent", type, data);
 };
