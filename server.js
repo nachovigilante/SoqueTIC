@@ -10,8 +10,10 @@ let DEBUGMODE = true;
 
 const makeStyledJSON = (object) => {
     const json = JSON.stringify(object, null, 2);
-    const lineCount = json.split("\n").length;
-    let styledJSON = chalk.blue(json.split("\n").slice(0, 15).join("\n"));
+    if (json === undefined) return chalk.blue("undefined");
+    const jsonSplitByLines = json.split("\n");
+    const lineCount = jsonSplitByLines.length;
+    let styledJSON = chalk.blue(jsonSplitByLines.slice(0, 15).join("\n"));
     if (lineCount > 15) {
         styledJSON += `\n... y ${lineCount - 15} líneas más`;
     }
