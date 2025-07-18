@@ -120,6 +120,19 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         DEBUGMODE && console.log(chalk.gray("Se desconectó un soquete"));
     });
+    socket.onAny((route, ...args) => {
+        if (!events[route]) {
+            DEBUGMODE &&
+                console.log(
+                    chalk.red(
+                        `Se pidió por una ruta inexistente: '${route}'. Revisá que esté el subscribeEvent apropiado y que coincidan los tipos. Las rutas disponibles son: ${Object.keys(
+                            events
+                        ).join(", ")}`
+                    )
+                );
+            socket.disconnect(true);
+        }
+    });
 });
 
 const sendEvent = (route, data) => {
