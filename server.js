@@ -122,14 +122,14 @@ io.on("connection", (socket) => {
     });
 });
 
-const sendEvent = (type, data) => {
+const sendEvent = (route, data) => {
     DEBUGMODE &&
         console.log(
             `Enviando evento: ${chalk.green(
-                `'${type}'`
+                `'${route}'`
             )} con la siguiente información:\n${makeStyledJSON(data)}`
         );
-    io.emit("realTimeEvent", type, data);
+    io.emit("realTimeEvent", route, data);
 };
 
 const startServer = (PORT = 3000, DEBUG = true) => {
