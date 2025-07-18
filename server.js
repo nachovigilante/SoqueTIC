@@ -20,8 +20,17 @@ const makeStyledJSON = (object) => {
     return styledJSON;
 };
 
-const onEvent = (type, handler) => {
-    events[type] = handler;
+const eventTypes = ["GET", "POST"];
+
+const subscribeEvent = (type, route, handler) => {
+    if (!eventTypes.includes(type)) {
+        throw new Error(
+            `No se puede subscribir eventos del tipo '${type}'. Los tipos soportados son: ${eventTypes.join(
+                ", "
+            )}`
+        );
+    }
+    events[route] = { type, route, handler };
 };
 
 const app = express();
@@ -35,12 +44,11 @@ const io = new Server(server, {
     },
 });
 
-const handleEvent = async (type, data) => {
-    const handler = events[type];
-    if (handler !== undefined) {
+const handlerWrapper = (type, route, handler) => {
+    return async (data) => {
         DEBUGMODE &&
             console.log(
-                `Llegó un evento: ${chalk.green(`'${type}'`)}${
+                `Llegó un evento ${chalk.green(`'${type}: ${route}'`)} ${
                     data
                         ? ` con la siguiente información:\n${makeStyledJSON(
                               data
@@ -52,66 +60,61 @@ const handleEvent = async (type, data) => {
         DEBUGMODE &&
             console.log(
                 `Se respondió al evento ${chalk.green(
-                    `'${type}'`
+                    `'${type}: ${route}'`
                 )} con:\n${makeStyledJSON(response)}`
             );
         return {
             status: 200,
             data: response,
         };
-    }
-    DEBUGMODE &&
+    };
+};
+
+/* DEBUGMODE &&
         console.log(chalk.red(`Llegó un evento no soportado: '${type}'`));
     return {
         status: 404,
         message: `Evento '${type}' no soportado.\nRevisá que esté el onEvent apropiado y que coincidan los tipos.`,
-    };
-};
+}*/
 
 io.on("connection", (socket) => {
     DEBUGMODE && console.log(chalk.gray("Se conectó un soquete"));
-    socket.on("realTimeEvent", async (type, data, callback) => {
-        try {
-            const result = await handleEvent(type, data);
-            callback(result);
-        } catch (e) {
-            callback({
-                status: 500,
-                message: `El servidor crasheó al mandar el mensaje '${type}' con la data:\n${JSON.stringify(
-                    data,
-                    null,
-                    2
-                )}`,
+    Object.values(events).forEach((event) => {
+        const { type, route, handler } = event;
+        if (type === "GET") {
+            socket.on(route, async (callback) => {
+                try {
+                    const result = await handlerWrapper(type, route, handler)();
+                    callback(result);
+                } catch (e) {
+                    callback({
+                        status: 500,
+                        message: `El servidor crasheó al mandar el mensaje '${route}'`,
+                    });
+                    throw e;
+                }
             });
-            throw e;
-        }
-    });
-    socket.on("GETEvent", async (type, callback) => {
-        try {
-            const result = await handleEvent(type, undefined);
-            callback(result);
-        } catch (e) {
-            callback({
-                status: 500,
-                message: `El servidor crasheó al mandar el mensaje '${type}'`,
+        } else if (type === "POST") {
+            socket.on(route, async (data, callback) => {
+                try {
+                    const result = await handlerWrapper(
+                        type,
+                        route,
+                        handler
+                    )(data);
+                    callback(result);
+                } catch (e) {
+                    callback({
+                        status: 500,
+                        message: `El servidor crasheó al mandar el mensaje '${route}' con la data:\n${JSON.stringify(
+                            data,
+                            null,
+                            2
+                        )}`,
+                    });
+                    throw e;
+                }
             });
-            throw e;
-        }
-    });
-    socket.on("POSTEvent", async (type, data, callback) => {
-        try {
-            const result = await handleEvent(type, data);
-            callback(result);
-        } catch (e) {
-            callback({
-                status: 500,
-                message: `El servidor crasheó al mandar el mensaje '${type}' con la data:\n${JSON.stringify(
-                    data,
-                    null,
-                    2
-                )}`,
-            });
-            throw e;
         }
     });
     socket.on("disconnect", () => {
@@ -154,4 +157,4 @@ const startServer = (PORT = 3000, DEBUG = true) => {
     });
 };
 
-export { onEvent, sendEvent, startServer };
+export { subscribeEvent, sendEvent, startServer };
