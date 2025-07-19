@@ -96,7 +96,7 @@ io.on("connection", (socket) => {
     // Subscribe to all GET and POST events
     Object.values(events["GET"]).forEach((e) => {
         const { type, event, handler } = e;
-        const route = `${type}:${e}`;
+        const route = `${type}:${event}`;
         socket.on(route, async (callback) => {
             try {
                 const result = await handlerWrapper(type, route, handler)();
