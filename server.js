@@ -3,8 +3,12 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import chalk from "chalk";
 
+const eventTypes = ["GET", "POST"];
 // events es un objeto que contiene los eventos que se pueden ejecutar y sus respectivos handlers
 const events = {};
+eventTypes.forEach((type) => {
+    events[type] = {};
+});
 // DEBUG es un booleano que determina si se muestran mensajes de debug en la consola
 let DEBUGMODE = true;
 
@@ -20,9 +24,15 @@ const makeStyledJSON = (object) => {
     return styledJSON;
 };
 
-const eventTypes = ["GET", "POST"];
+const subscribeGETEvent = (event, handler) => {
+    subscribeEvent("GET", event, handler);
+};
 
-const subscribeEvent = (type, route, handler) => {
+const subscribePOSTEvent = (event, handler) => {
+    subscribeEvent("POST", event, handler);
+};
+
+const subscribeEvent = (type, event, handler) => {
     if (!eventTypes.includes(type)) {
         throw new Error(
             `No se puede subscribir eventos del tipo '${type}'. Los tipos soportados son: ${eventTypes.join(
@@ -30,7 +40,11 @@ const subscribeEvent = (type, route, handler) => {
             )}`
         );
     }
-    events[route] = { type, route, handler };
+    events[type][event] = {
+        type,
+        event,
+        handler,
+    };
 };
 
 const app = express();
@@ -44,11 +58,11 @@ const io = new Server(server, {
     },
 });
 
-const handlerWrapper = (type, route, handler) => {
+const handlerWrapper = (type, event, handler) => {
     return async (data) => {
         DEBUGMODE &&
             console.log(
-                `Llegó un evento ${chalk.green(`'${type}: ${route}'`)} ${
+                `Llegó un evento ${chalk.green(`'${type}:${event}'`)} ${
                     data
                         ? ` con la siguiente información:\n${makeStyledJSON(
                               data
@@ -60,7 +74,7 @@ const handlerWrapper = (type, route, handler) => {
         DEBUGMODE &&
             console.log(
                 `Se respondió al evento ${chalk.green(
-                    `'${type}: ${route}'`
+                    `'${type}:${event}'`
                 )} con:\n${makeStyledJSON(response)}`
             );
         return {
@@ -79,70 +93,71 @@ const handlerWrapper = (type, route, handler) => {
 
 io.on("connection", (socket) => {
     DEBUGMODE && console.log(chalk.gray("Se conectó un soquete"));
-    Object.values(events).forEach((event) => {
-        const { type, route, handler } = event;
-        if (type === "GET") {
-            socket.on(route, async (callback) => {
-                try {
-                    const result = await handlerWrapper(type, route, handler)();
-                    callback(result);
-                } catch (e) {
-                    callback({
-                        status: 500,
-                        message: `El servidor crasheó al mandar el mensaje '${route}'`,
-                    });
-                    throw e;
-                }
-            });
-        } else if (type === "POST") {
-            socket.on(route, async (data, callback) => {
-                try {
-                    const result = await handlerWrapper(
-                        type,
-                        route,
-                        handler
-                    )(data);
-                    callback(result);
-                } catch (e) {
-                    callback({
-                        status: 500,
-                        message: `El servidor crasheó al mandar el mensaje '${route}' con la data:\n${JSON.stringify(
-                            data,
-                            null,
-                            2
-                        )}`,
-                    });
-                    throw e;
-                }
-            });
-        }
+    // Subscribe to all GET and POST events
+    Object.values(events["GET"]).forEach((e) => {
+        const { type, event, handler } = e;
+        const route = `${type}:${e}`;
+        socket.on(route, async (callback) => {
+            try {
+                const result = await handlerWrapper(type, route, handler)();
+                callback(result);
+            } catch (e) {
+                callback({
+                    status: 500,
+                    message: `El servidor crasheó al responder el mensaje '${route}'`,
+                });
+                throw e;
+            }
+        });
+    });
+    Object.values(events["POST"]).forEach((e) => {
+        const { type, event, handler } = e;
+        const route = `${type}:${event}`;
+
+        socket.on(route, async (data, callback) => {
+            try {
+                const result = await handlerWrapper(type, route, handler)(data);
+                callback(result);
+            } catch (e) {
+                callback({
+                    status: 500,
+                    message: `El servidor crasheó al mandar el mensaje '${route}' con la data:\n${JSON.stringify(
+                        data,
+                        null,
+                        2
+                    )}`,
+                });
+                throw e;
+            }
+        });
     });
     socket.on("disconnect", () => {
         DEBUGMODE && console.log(chalk.gray("Se desconectó un soquete"));
     });
-    socket.onAny((route, ...args) => {
-        if (!events[route]) {
+    socket.onAny((event, ...args) => {
+        const eventRoutes = Object.keys(events["GET"])
+            .map((e) => `GET:${e}`)
+            .concat(Object.keys(events["POST"]).map((e) => `POST:${e}`));
+        if (!eventRoutes.includes(event)) {
             DEBUGMODE &&
                 console.log(
                     chalk.red(
-                        `Se pidió por una ruta inexistente: '${route}'. Revisá que esté el subscribeEvent apropiado y que coincidan los tipos. Las rutas disponibles son: ${Object.keys(
-                            events
-                        ).join(", ")}`
+                        `Se pidió por una ruta inexistente: '${event}'. Revisá que esté el subscribeEvent apropiado y que coincidan los tipos. Las rutas disponibles son: ${eventRoutes.join(
+                            ", "
+                        )}`
                     )
                 );
-            socket.disconnect(true);
         }
     });
 });
-
-const sendEvent = (route, data) => {
+const sendEvent = (event, data) => {
     DEBUGMODE &&
         console.log(
             `Enviando evento: ${chalk.green(
-                `'${route}'`
+                `'${event}'`
             )} con la siguiente información:\n${makeStyledJSON(data)}`
         );
-    io.emit("realTimeEvent", route, data);
+    io.emit(event, data);
 };
 
 const startServer = (PORT = 3000, DEBUG = true) => {
@@ -170,4 +185,4 @@ const startServer = (PORT = 3000, DEBUG = true) => {
     });
 };
 
-export { subscribeEvent, sendEvent, startServer };
+export { subscribeGETEvent, subscribePOSTEvent, sendEvent, startServer };
