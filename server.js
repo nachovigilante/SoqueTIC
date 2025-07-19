@@ -62,7 +62,7 @@ const handlerWrapper = (type, event, handler) => {
     return async (data) => {
         DEBUGMODE &&
             console.log(
-                `Llegó un evento ${chalk.green(`'${type}:${event}'`)} ${
+                `Llegó un evento ${chalk.green(`'${event}'`)} ${
                     data
                         ? ` con la siguiente información:\n${makeStyledJSON(
                               data
@@ -74,7 +74,7 @@ const handlerWrapper = (type, event, handler) => {
         DEBUGMODE &&
             console.log(
                 `Se respondió al evento ${chalk.green(
-                    `'${type}:${event}'`
+                    `'${event}'`
                 )} con:\n${makeStyledJSON(response)}`
             );
         return {
@@ -150,14 +150,14 @@ io.on("connection", (socket) => {
         }
     });
 });
-const sendEvent = (event, data) => {
+const realTimeEvent = (event, data) => {
     DEBUGMODE &&
         console.log(
             `Enviando evento: ${chalk.green(
-                `'${event}'`
+                `'RT:${event}'`
             )} con la siguiente información:\n${makeStyledJSON(data)}`
         );
-    io.emit(event, data);
+    io.emit(`RT:${event}`, data);
 };
 
 const startServer = (PORT = 3000, DEBUG = true) => {
@@ -185,4 +185,4 @@ const startServer = (PORT = 3000, DEBUG = true) => {
     });
 };
 
-export { subscribeGETEvent, subscribePOSTEvent, sendEvent, startServer };
+export { subscribeGETEvent, subscribePOSTEvent, realTimeEvent, startServer };
