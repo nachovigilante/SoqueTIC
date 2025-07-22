@@ -4,7 +4,11 @@
     "description": "",
     "main": "server.js",
     "type": "module",
-    "scripts": {},
+    "scripts": {
+        "start": "node main.js",
+        "dev": "nodemon main.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
     "keywords": [],
     "author": {
         "name": "Ignacio Vigilante",
@@ -26,5 +30,8 @@
     },
     "publishConfig": {
         "@nachovigilante:registry": "https://registry.npmjs.org"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10"
     }
 }

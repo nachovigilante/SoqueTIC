@@ -59,18 +59,30 @@ const io = new Server(server, {
 });
 
 const handlerWrapper = (type, event, handler) => {
-    return async (data) => {
+    return async (payload) => {
+        const { data, query } = payload;
         DEBUGMODE &&
             console.log(
-                `Llegó un evento ${chalk.green(`'${event}'`)} ${
-                    data
-                        ? ` con la siguiente información:\n${makeStyledJSON(
-                              data
-                          )}`
-                        : ""
-                }`
+                `Llegó un evento ${chalk.green(`'${event}'`)}\n` +
+                    `${
+                        query
+                            ? `Tiene los siguientes parámetros query:\n${makeStyledJSON(
+                                  query
+                              )}`
+                            : ""
+                    }\n` +
+                    `${
+                        data
+                            ? `Tiene la siguiente información:\n${makeStyledJSON(
+                                  data
+                              )}`
+                            : ""
+                    }`
             );
-        const response = await handler(data);
+
+        const response = await (type === "GET"
+            ? handler(query)
+            : handler(data, query));
         DEBUGMODE &&
             console.log(
                 `Se respondió al evento ${chalk.green(
@@ -84,22 +96,19 @@ const handlerWrapper = (type, event, handler) => {
     };
 };
 
-/* DEBUGMODE &&
-        console.log(chalk.red(`Llegó un evento no soportado: '${type}'`));
-    return {
-        status: 404,
-        message: `Evento '${type}' no soportado.\nRevisá que esté el onEvent apropiado y que coincidan los tipos.`,
-}*/
-
 io.on("connection", (socket) => {
     DEBUGMODE && console.log(chalk.gray("Se conectó un soquete"));
     // Subscribe to all GET and POST events
     Object.values(events["GET"]).forEach((e) => {
         const { type, event, handler } = e;
         const route = `${type}:${event}`;
-        socket.on(route, async (callback) => {
+        socket.on(route, async (payload, callback) => {
             try {
-                const result = await handlerWrapper(type, route, handler)();
+                const result = await handlerWrapper(
+                    type,
+                    route,
+                    handler
+                )(payload);
                 callback(result);
             } catch (e) {
                 callback({
@@ -114,9 +123,13 @@ io.on("connection", (socket) => {
         const { type, event, handler } = e;
         const route = `${type}:${event}`;
 
-        socket.on(route, async (data, callback) => {
+        socket.on(route, async (payload, callback) => {
             try {
-                const result = await handlerWrapper(type, route, handler)(data);
+                const result = await handlerWrapper(
+                    type,
+                    route,
+                    handler
+                )(payload);
                 callback(result);
             } catch (e) {
                 callback({
@@ -141,11 +154,14 @@ io.on("connection", (socket) => {
         if (!eventRoutes.includes(event)) {
             DEBUGMODE &&
                 console.log(
-                    chalk.red(
-                        `Se pidió por una ruta inexistente: '${event}'. Revisá que esté el subscribeEvent apropiado y que coincidan los tipos. Las rutas disponibles son: ${eventRoutes.join(
-                            ", "
-                        )}`
-                    )
+                    chalk.bgRed(
+                        `Se pidió por un evento inexistente: '${event}'\n`
+                    ) +
+                        chalk.yellow(
+                            `Revisá que esté el subscribeEvent apropiado y que coincidan los tipos. Los eventos disponibles son: ${eventRoutes.join(
+                                ", "
+                            )}\n`
+                        )
                 );
         }
     });
