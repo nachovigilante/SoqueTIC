@@ -65,12 +65,12 @@ const handlerWrapper = (type, event, handler) => {
             console.log(
                 `Llegó un evento ${chalk.green(`'${event}'`)}\n` +
                     `${
-                        query
+                        query && Object.keys(query).length > 0
                             ? `Tiene los siguientes parámetros query:\n${makeStyledJSON(
                                   query
-                              )}`
+                              )}\n`
                             : ""
-                    }\n` +
+                    }` +
                     `${
                         data
                             ? `Tiene la siguiente información:\n${makeStyledJSON(
