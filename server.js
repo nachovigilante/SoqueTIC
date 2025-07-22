@@ -113,7 +113,7 @@ io.on("connection", (socket) => {
             } catch (e) {
                 callback({
                     status: 500,
-                    message: `El servidor crasheó al responder el mensaje '${route}'${
+                    message: `El servidor crasheó al procesar el evento '${route}'${
                         payload.query
                             ? ` con la query:\n${JSON.stringify(
                                   payload.query,
@@ -142,7 +142,7 @@ io.on("connection", (socket) => {
             } catch (e) {
                 callback({
                     status: 500,
-                    message: `El servidor crasheó al mandar el mensaje '${route}' con la data:\n${JSON.stringify(
+                    message: `El servidor crasheó al procesar el evento '${route}' con la data:\n${JSON.stringify(
                         payload.data,
                         null,
                         2
